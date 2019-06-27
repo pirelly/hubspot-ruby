@@ -117,6 +117,14 @@ module Hubspot
         yield if block_given?
       end
 
+      def contact_identifire(contact)
+        if contact[:email]
+          { email: contact[:email] }
+        elsif contact[:vid]
+          { vid: contact[:vid] }
+        end
+      end
+
       private
 
       def find_by_name(name, set)
