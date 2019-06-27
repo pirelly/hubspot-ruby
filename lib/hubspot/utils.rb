@@ -120,7 +120,7 @@ module Hubspot
       def contact_identifire(contact)
         if contact[:email]
           { email: contact[:email] }
-        else contact[:vid]
+        elsif contact[:vid]
           { vid: contact[:vid] }
         end
       end

@@ -56,7 +56,7 @@ class Hubspot::Contact < Hubspot::Resource
           properties: Hubspot::Utils.hash_to_properties(
             contact[:properties].stringify_keys, key_name: "property") })
       end
-      response = Hubspot::Connection.post_json(
+      Hubspot::Connection.post_json(
         BATCH_CREATE_OR_UPDATE_PATH, params: {}, body: request
       )
     end
