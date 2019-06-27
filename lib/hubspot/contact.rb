@@ -2,16 +2,17 @@ class Hubspot::Contact < Hubspot::Resource
   self.id_field = "vid"
   self.update_method = "post"
 
-  ALL_PATH                = '/contacts/v1/lists/all/contacts/all'
-  CREATE_PATH             = '/contacts/v1/contact'
-  CREATE_OR_UPDATE_PATH   = '/contacts/v1/contact/createOrUpdate/email/:email'
-  DELETE_PATH             = '/contacts/v1/contact/vid/:id'
-  FIND_PATH               = '/contacts/v1/contact/vid/:id/profile'
-  FIND_BY_EMAIL_PATH      = '/contacts/v1/contact/email/:email/profile'
-  FIND_BY_USER_TOKEN_PATH = '/contacts/v1/contact/utk/:token/profile'
-  MERGE_PATH              = '/contacts/v1/contact/merge-vids/:id/'
-  SEARCH_PATH             = '/contacts/v1/search/query'
-  UPDATE_PATH             = '/contacts/v1/contact/vid/:id/profile'
+  ALL_PATH                    = '/contacts/v1/lists/all/contacts/all'
+  CREATE_PATH                 = '/contacts/v1/contact'
+  CREATE_OR_UPDATE_PATH       = '/contacts/v1/contact/createOrUpdate/email/:email'
+  BATCH_CREATE_OR_UPDATE_PATH = '/contacts/v1/contact/batch/'
+  DELETE_PATH                 = '/contacts/v1/contact/vid/:id'
+  FIND_PATH                   = '/contacts/v1/contact/vid/:id/profile'
+  FIND_BY_EMAIL_PATH          = '/contacts/v1/contact/email/:email/profile'
+  FIND_BY_USER_TOKEN_PATH     = '/contacts/v1/contact/utk/:token/profile'
+  MERGE_PATH                  = '/contacts/v1/contact/merge-vids/:id/'
+  SEARCH_PATH                 = '/contacts/v1/search/query'
+  UPDATE_PATH                 = '/contacts/v1/contact/vid/:id/profile'
 
   class << self
     def all(opts = {})
@@ -47,6 +48,17 @@ class Hubspot::Contact < Hubspot::Resource
       }
       response = Hubspot::Connection.post_json(CREATE_OR_UPDATE_PATH, params: {email: email}, body: request)
       from_result(response)
+    end
+
+    def batch_create_or_update(contacts)
+      request = contacts.map do |contact|
+        Hubspot::Utils.contact_identifire(contact).merge!({
+          properties: Hubspot::Utils.hash_to_properties(
+            contact[:properties].stringify_keys, key_name: "property") })
+      end
+      response = Hubspot::Connection.post_json(
+        BATCH_CREATE_OR_UPDATE_PATH, params: {}, body: request
+      )
     end
 
     def search(query, opts = {})
